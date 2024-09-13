@@ -19,10 +19,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
+    private $managerRegistry;
     private $classMetadata;
     private $contact;
     private $queryBuilder;
@@ -45,6 +47,7 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->managerRegistry      = $this->createMock(ManagerRegistry::class);
         $this->classMetadata        = $this->createMock(ClassMetadata::class);
         $this->contact              = $this->createMock(Lead::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
@@ -55,8 +58,8 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
         $this->query                = $this->createMock(AbstractQuery::class);
         $this->repository           = new CustomItemXrefContactRepository(
-            $this->entityManager,
-            $this->classMetadata
+            $this->managerRegistry,
+            CustomItemXrefContactRepository::class
         );
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
@@ -146,5 +149,13 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testGetTableAlias(): void
     {
         $this->assertSame(CustomItemXrefContact::TABLE_ALIAS, $this->repository->getTableAlias());
+    }
+
+    public function testUpdateContact(): void
+    {
+
+        $this->repository->updateContact( 1,2  );
+        $sql = $this->queryBuilder->getSQL();
+        dump($sql);
     }
 }
